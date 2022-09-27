@@ -7,6 +7,8 @@ void	philo_eats(t_philosopher *philo)
 	rules = philo->rules;
 	pthread_mutex_lock(&(rules->forks[philo->left_fork_id]));
 	action_print(rules, philo->id, "has taken a fork");
+	if (rules->philo_count == 1 || rules->all_ate == 1)
+		exit_launcher(rules, philo);
 	pthread_mutex_lock(&(rules->forks[philo->right_fork_id]));
 	action_print(rules, philo->id, "has taken a fork");
 	pthread_mutex_lock(&(rules->meal_check));
@@ -48,6 +50,9 @@ void	exit_launcher(t_rules *rules, t_philosopher *philos)
 	int	i;
 
 	i = -1;
+	if (time_diff(philos[++i].t_last_meal, timestamp()) > rules->time_to_die
+		&& rules->philo_count == 1)
+		action_print(rules, i, "died");
 	while (++i < rules->philo_count)
 		pthread_join(philos[i].thread_id, NULL);
 	i = -1;
@@ -77,7 +82,7 @@ void	death_checker(t_rules *r, t_philosopher *p)
 		if (r->died)
 			break ;
 		i = 0;
-		while (r->number_must_eat != -1 && i < r->philo_count
+		while (r->number_must_eat != -1 && i <= r->philo_count
 			&& p[i].ate_count >= r->number_must_eat)
 			i++;
 		if (i == r->philo_count)

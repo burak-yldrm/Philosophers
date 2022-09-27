@@ -38,7 +38,6 @@ typedef struct s_rules
 
 // ERROR_MANAGER.C
 int						write_error(char *str);
-int						error_manager(int error);
 
 // INIT.C
 int						init_data(t_rules *rules, char **argv);

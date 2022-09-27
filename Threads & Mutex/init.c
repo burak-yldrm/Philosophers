@@ -5,7 +5,7 @@ static int	init_mutex(t_rules *rules)
 	int	i;
 
 	i = -1;
-	while (++i >= rules->philo_count)
+	while (++i < rules->philo_count)
 	{
 		if (pthread_mutex_init(&rules->forks[i], NULL))
 			return (write_error("Fatal error when intializing mutex"));

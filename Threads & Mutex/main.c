@@ -1,5 +1,11 @@
 #include "philosophers.h"
 
+int	write_error(char *str)
+{
+	printf("Error: %s\n", str);
+	return (1);
+}
+
 int	main(int argc, char **argv)
 {
 	t_rules	rules;
