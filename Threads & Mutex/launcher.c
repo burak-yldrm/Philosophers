@@ -7,7 +7,7 @@ void	philo_eats(t_philosopher *philo)
 	rules = philo->rules;
 	pthread_mutex_lock(&(rules->forks[philo->left_fork_id]));
 	action_print(rules, philo->id, "has taken a fork");
-	if (rules->philo_count == 1 || rules->all_ate == 1)
+	if (rules->philo_count == 1)
 		exit_launcher(rules, philo);
 	pthread_mutex_lock(&(rules->forks[philo->right_fork_id]));
 	action_print(rules, philo->id, "has taken a fork");
@@ -23,24 +23,21 @@ void	philo_eats(t_philosopher *philo)
 
 void	*p_thread(void *void_philosopher)
 {
-	int				i;
 	t_philosopher	*philo;
 	t_rules			*rules;
 
-	i = 0;
 	philo = (t_philosopher *)void_philosopher;
 	rules = philo->rules;
 	if (philo->id % 2)
 		usleep(15000);
 	while (!(rules->died))
 	{
-		philo_eats(philo);
 		if (rules->all_ate)
 			break ;
+		philo_eats(philo);
 		action_print(rules, philo->id, "is sleeping");
 		smart_sleep(rules->time_to_sleep, rules);
 		action_print(rules, philo->id, "is thinking");
-		i++;
 	}
 	return (NULL);
 }
@@ -58,6 +55,7 @@ void	exit_launcher(t_rules *rules, t_philosopher *philos)
 	i = -1;
 	while (++i < rules->philo_count)
 		pthread_mutex_destroy(&(rules->forks[i]));
+	pthread_mutex_destroy(&(rules->meal_check));
 	pthread_mutex_destroy(&(rules->writing));
 }
 
@@ -81,11 +79,10 @@ void	death_checker(t_rules *r, t_philosopher *p)
 		}
 		if (r->died)
 			break ;
-		i = 0;
+		i = -1;
 		while (r->number_must_eat != -1 && i <= r->philo_count
-			&& p[i].ate_count >= r->number_must_eat)
-			i++;
-		if (i == r->philo_count)
+			&& p[++i].ate_count >= r->number_must_eat)
+		if (i >= r->philo_count)
 			r->all_ate = 1;
 	}
 }
